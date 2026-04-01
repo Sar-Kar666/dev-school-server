@@ -2,6 +2,8 @@ import { Router, type Request, type Response } from "express";
 import { User } from "../lib/zodSchema";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"
+import { userAuth } from "../middlewares/userAuth";
 const saltRounds =10;
 export const userRouter = Router();
 
@@ -54,11 +56,51 @@ userRouter.post("/signin", async (req:Request,res:Response)=>{
 
     if(!user){
         res.status(401).json({
-            message:"incorect username or password"
+            message:"Please signup to continue"
         })
-    };
-
-    const isMatch = await  bcrypt.compare(password,user?.password)
+    }else{
+    const isMatch = await  bcrypt.compare(password,user.password);
     
+    if(!isMatch){
+        res.status(401).json({
+            message:"incorrect password"
+        })
+    }
+    else{
 
+        const token = jwt.sign(
+            {userId:user.id, role :user.role},process.env.JWT_SECRET!
+        )
+         res.json({
+        message:"singed up succesfully",
+        token
+    })
+    }
+    
+    }
+
+   
+   
+
+})
+
+userRouter.get("/courses",userAuth,async(req:Request,res:Response)=>{
+
+    const userId=req.user?.userId;
+    if(!userId){
+        return res.status(401).json({
+            message:"Invalid token"
+        })
+    }
+
+    const courses = await prisma.purchase.findMany({
+        where: { userId: userId },
+    include: {
+        course: true 
+    }
+    })
+
+    return res.status(201).json({
+        courses
+    })
 })

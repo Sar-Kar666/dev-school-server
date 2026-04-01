@@ -11,10 +11,34 @@ datasource db {
 
 
 model User{
-  id   String @id @default(uuid())  
-  email   String  @unique
-  password  String 
-  role  Role  @default(USER)
+  id              String        @id @default(uuid())  
+  email           String        @unique
+  password        String 
+  role            Role          @default(USER)
+  createdCourses  Course[]      @relation("CreatedCourses")
+  purchases       Purchase[]
+}
+
+model Course{
+  id              String        @id @default(uuid())
+  title           String        @unique
+  description     String
+  price           Int
+  creatorId       String
+  creator         User          @relation("CreatedCourses",fields: [creatorId],references: [id])
+  purchases       Purchase[]
+  createdAt       DateTime      @default(now())
+
+  
+}
+
+model Purchase{
+  id              String        @id @default(uuid())
+  userId          String
+  courseId        String
+  user            User          @relation(fields: [userId],references: [id])
+  course          Course        @relation(fields: [courseId],references: [id])
+   createdAt      DateTime      @default(now())
 }
 
 enum Role{
