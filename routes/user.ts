@@ -4,13 +4,14 @@ import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { userAuth } from "../middlewares/userAuth";
+import { adminAuth } from "../middlewares/adminAuth";
 const saltRounds =10;
 export const userRouter = Router();
 
 userRouter.post("/signup",async (req:Request,res:Response)=>{
-    const {email,password }= req.body;
+    const {username,email,password }= req.body;
 
-    const result = User.safeParse({ email: email,password:password });
+    const result = User.safeParse({ username:username,email: email,password:password });
     if (!result.success) {
     res.json({
         message: result.error.issues[0]?.message
@@ -29,6 +30,7 @@ userRouter.post("/signup",async (req:Request,res:Response)=>{
            const hassedPassword=await  bcrypt.hash(password, saltRounds)
             const user = await prisma.user.create({
             data:{
+                username:username,
                 email: email,
                 password:hassedPassword
             }
@@ -73,7 +75,9 @@ userRouter.post("/signin", async (req:Request,res:Response)=>{
         )
          res.json({
         message:"singed up succesfully",
-        token
+        token,
+        role:user.role
+        
     })
     }
     
@@ -82,6 +86,24 @@ userRouter.post("/signin", async (req:Request,res:Response)=>{
    
    
 
+})
+
+
+userRouter.get("/",userAuth,async(req:Request,res:Response)=>{
+    const userId=req.user?.userId;
+
+    const user = await prisma.user.findFirst({
+        where:{
+            id:userId
+        },select:{
+            username:true,
+            email:true
+        }
+    })
+
+    res.json({
+        user
+    })
 })
 
 userRouter.get("/courses",userAuth,async(req:Request,res:Response)=>{
@@ -104,3 +126,4 @@ userRouter.get("/courses",userAuth,async(req:Request,res:Response)=>{
         courses
     })
 })
+
