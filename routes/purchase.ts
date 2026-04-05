@@ -27,7 +27,7 @@ purchaseRouter.post("/buy",userAuth,async(req:Request,res:Response)=>{
 })
 
 
-purchaseRouter.post("/my-courses",userAuth,async(req:Request,res:Response)=>{
+purchaseRouter.get("/my-courses",userAuth,async(req:Request,res:Response)=>{
     const userId= req.user?.userId;
 
     if (!userId) {
