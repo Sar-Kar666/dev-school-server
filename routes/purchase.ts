@@ -25,3 +25,27 @@ purchaseRouter.post("/buy",userAuth,async(req:Request,res:Response)=>{
         purchase
     })
 })
+
+
+purchaseRouter.post("/my-courses",userAuth,async(req:Request,res:Response)=>{
+    const userId= req.user?.userId;
+
+    if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+    
+
+    const purchasedCourses= await prisma.purchase.findMany({
+        where: {
+            userId: userId,
+        },
+        include: {
+            course: true, // Includes all the fields from the Course model
+        },
+        });
+
+    res.json({
+        message:"Owned Courses",
+        purchasedCourses
+    })
+})
