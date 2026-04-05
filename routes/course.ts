@@ -12,13 +12,14 @@ courseRouter.post("/create",adminAuth,async (req:Request,res:Response)=>{
             return res.status(401).json({
                 message: "Unauthorized"
             });}
-    const{title,description,price}= req.body;
+    const{title,imageUrl,description,price,}= req.body;
 
     const course = await prisma.course.create({
         data:{
             title,
             description,
            price,
+           imageUrl,
            creatorId:userId
         }
     })

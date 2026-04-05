@@ -25,12 +25,11 @@ model Course{
   title           String        @unique
   description     String
   price           Int
+  imageUrl        String?
   creatorId       String
   creator         User          @relation("CreatedCourses",fields: [creatorId],references: [id])
   purchases       Purchase[]
   createdAt       DateTime      @default(now())
-
-  
 }
 
 model Purchase{
