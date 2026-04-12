@@ -12,7 +12,20 @@ purchaseRouter.post("/buy",userAuth,async(req:Request,res:Response)=>{
             return res.status(401).json({ message: "Unauthorized" });
         }
     
+const existingPurchase = await prisma.purchase.findFirst({
+        where: {
+            userId: userId,
+            courseId: courseId, // Filter by both user and the specific course
+        },
+    });
 
+    // 2. If it exists, stop the user from buying it again
+    if (existingPurchase) {
+        return res.status(400).json({ 
+            message: "You already own this course" 
+        });
+    };
+    
     const purchase = await prisma.purchase.create({
         data:{
             userId,
@@ -33,7 +46,7 @@ purchaseRouter.get("/my-courses",userAuth,async(req:Request,res:Response)=>{
     if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-    
+  
 
     const purchasedCourses= await prisma.purchase.findMany({
         where: {
