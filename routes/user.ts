@@ -127,3 +127,38 @@ userRouter.get("/courses",userAuth,async(req:Request,res:Response)=>{
     })
 })
 
+
+userRouter.put("/edit-details", userAuth, async (req: Request, res: Response) => {
+
+    const userId = req.user?.userId;
+    const { username, email } = req.body;
+
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+       
+        const updatedUser = await prisma.user.update({
+            where: { 
+                id: userId 
+            },
+            data: {
+                username: username, 
+                email: email        
+            }
+        });
+
+        return res.status(200).json({
+            message: "User updated successfully",
+            user: updatedUser
+        });
+
+    } catch (e:any) {
+       
+        return res.status(400).json({
+            message: "Update failed",
+            error: e.message
+        });
+    }
+});
