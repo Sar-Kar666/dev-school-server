@@ -37,7 +37,12 @@ purchaseRouter.post("/buy",userAuth,async(req:Request,res:Response)=>{
     const options = {
             amount: Math.round(course.price * 100), // Amount in paise
             currency: "INR",
-            receipt: `course_buy_${userId}_${courseId}`,
+           receipt: `rcpt_${userId.slice(-6)}_${courseId.slice(-6)}`, 
+    // Pass the full IDs in notes for your reference later
+            notes: {
+                userId: userId,
+                courseId: courseId
+            }
         };
     const rzpOrder = await razorpay.orders.create(options);
 
