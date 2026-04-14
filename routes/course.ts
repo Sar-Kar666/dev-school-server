@@ -49,3 +49,23 @@ courseRouter.get("/",async(req:Request,res:Response)=>{
         courses
     })
 })
+
+courseRouter.delete("/delete-course",adminAuth,async(req:Request,res:Response)=>{
+    const {courseId}=req.body;
+    if(!courseId) return res.status(401).json({message:"unauthorized"})
+        try{ 
+       const deleteCourse= await prisma.course.delete({
+        where:{
+            id:courseId
+        }
+    })
+       return res.status(200).json({ message: "Course deleted successfully" });
+    }catch(e:any){
+       if (e.code === 'P2025') {
+            return res.status(404).json({ message: "Course not found" });
+        }
+        return res.status(500).json({ message: "Internal server error", error: e.message});
+    }
+
+
+})
