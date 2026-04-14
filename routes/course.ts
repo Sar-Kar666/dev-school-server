@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { adminAuth } from "../middlewares/adminAuth";
 import { prisma } from "../lib/prisma";
+import { json } from "zod";
 
 export const courseRouter =Router();
 
@@ -67,5 +68,28 @@ courseRouter.delete("/delete-course",adminAuth,async(req:Request,res:Response)=>
         return res.status(500).json({ message: "Internal server error", error: e.message});
     }
 
+
+})
+
+
+courseRouter.put("/edit-course",adminAuth,async(req:Request,res:Response)=>{
+    const {courseId,title,description,imageUrl,price}=req.body;
+    if(!courseId) return res.status(400).json({message:"unauthorized"})
+        try{
+            const editCourse= await prisma.course.update({
+                where:{
+                    id:courseId
+                },
+                data:{title,description,imageUrl,price}
+            })
+
+            res.status(200),json({
+                message:"Succesfully Edited course"
+            })
+        }catch(e:any){
+            res.status(400).json({
+                message:e.data.message
+            })
+        }
 
 })
