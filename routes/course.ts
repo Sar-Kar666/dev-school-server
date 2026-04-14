@@ -74,7 +74,7 @@ courseRouter.delete("/delete-course",adminAuth,async(req:Request,res:Response)=>
 
 courseRouter.put("/edit-course",adminAuth,async(req:Request,res:Response)=>{
     const {courseId,title,description,imageUrl,price}=req.body;
-    if(!courseId) return res.status(400).json({message:"unauthorized"})
+    if(!courseId) return res.status(400).json({message:"Bad request"})
         try{
             const editCourse= await prisma.course.update({
                 where:{
@@ -82,8 +82,8 @@ courseRouter.put("/edit-course",adminAuth,async(req:Request,res:Response)=>{
                 },
                 data:{title,description,imageUrl,price}
             })
-
-            res.status(200),json({
+            if(!editCourse) return res.status(400).json({mesage:"Error"})
+            res.status(200).json({
                 message:"Succesfully Edited course"
             })
         }catch(e:any){
