@@ -15,7 +15,7 @@ declare global {
 
 
 export const userAuth=(req:Request,res:Response,next:NextFunction)=>{
-    const token  =req.headers.token as string;
+    const token  =req.headers.token  as string;
     if(!token){
         return res.status(401).json({
             message:"no token provided"

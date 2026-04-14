@@ -162,3 +162,36 @@ userRouter.put("/edit-details", userAuth, async (req: Request, res: Response) =>
         });
     }
 });
+
+
+userRouter.put("/edit-password",userAuth, async (req:Request,res:Response)=>{
+    const userId= req.user?.userId;
+    const {oldPassword,newPassword}=req.body;
+
+    try{
+        const user = await prisma.user.findFirst({
+            where:{
+                id:userId
+            }
+        });
+        if(!user) return;
+
+        const match= await bcrypt.compare(oldPassword,user?.password);
+
+        if(!match) res.status(401).json({message:"Incorrect Old Passowrd"});
+        const updatedPassword = await bcrypt.hash(newPassword,saltRounds);
+
+        const updatedUser= await prisma.user.update({
+            where:{id:userId},
+            data:{password:updatedPassword}
+        })
+
+        res.status(200).json({
+            message:"Password Updated Succesfuly"
+        })
+    }catch(e:any){
+        res.status(401).json({
+            message: e.data.message
+        })
+    }
+})
