@@ -52,7 +52,7 @@ courseRouter.get("/",async(req:Request,res:Response)=>{
 
 courseRouter.delete("/delete-course",adminAuth,async(req:Request,res:Response)=>{
     const {courseId}=req.body;
-    if(!courseId) return res.status(401).json({message:"unauthorized"})
+    if(!courseId) return res.status(400).json({message:"unauthorized"})
         try{ 
        const deleteCourse= await prisma.course.delete({
         where:{

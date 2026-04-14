@@ -37,7 +37,7 @@ model Purchase{
   userId          String
   courseId        String
   user            User          @relation(fields: [userId],references: [id])
-  course          Course        @relation(fields: [courseId],references: [id])
+  course          Course        @relation(fields: [courseId],references: [id],onDelete: Cascade)
    createdAt      DateTime      @default(now())
 }
 
